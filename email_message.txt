@@ -1,0 +1,12 @@
+Dear ${USER_NAME},
+
+This is a notice that a book that you have checked out is overdue!
+
+Title: ${BOOK_TITLE}
+Due Date: ${DUE_DATE}
+
+Please return the books as soon as possible to avoid late fees.
+
+Thank you,
+
+MSD Library System Management

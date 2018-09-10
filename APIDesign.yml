@@ -1,0 +1,401 @@
+openapi: 3.0.0
+info:
+  title: MSD Team 2 Book API
+  description: This is Team 2's Book API project for MSD Summer 2018
+  version: "1.0.0-oas3"
+servers:
+  - url: 'https://msd-library.herokuapp.com'
+    description: project deployed on heroku
+  - url: 'http://127.0.0.1:5000/'
+    description: project runs on localhost
+components:
+  schemas:
+    user:
+      properties:
+        userid:
+          type: integer
+        email:
+          type: string
+        isadmin:
+          type: boolean
+        firstname:
+          type: string
+        lastname:
+          type: string
+        phone:
+          type: string
+        
+    book:
+      properties:
+        bookid:
+          type: integer
+        author:
+          type: array
+        genre:
+          type: string
+        publishedDate:
+          type: string
+        loanStatus:
+          type: boolean
+        userid:
+          type: integer
+        
+  responses:
+    ParseError:
+      description: When a mask can't be parsed
+    MaskError:
+      description: When any error occurs on mask
+tags:
+  - name: home
+    description: Default home space
+  - name: users
+    description: Users in the system
+  - name: books
+    description: Books in the system
+  - name: bookNotes
+    description: Notes for books in the system
+paths:
+  /:
+    get:
+      responses:
+        '200':
+          description: Success
+      operationId: index
+      tags:
+        - home
+  /users/:
+    get:
+      summary: returns a list of all users in the system
+      operationId: getUsers
+      tags:
+        - users
+      responses:
+        '200':
+          description: A JSON array of all users
+    post:
+      summary: creates a new user
+      operationId: createUser
+      tags:
+        - users
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/user'
+      responses:
+        '201':
+          description: User Created
+    delete:
+      summary: delete user
+      operationId: deleteUser
+      tags:
+        - users
+      parameters:
+        - name: users
+          in: path
+          description: userDelete
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: success
+  '/users/{userid}':
+    get:
+      summary: returns the user with matching ID
+      operationId: getUser
+      tags:
+        - users
+      parameters:
+        - name: userid
+          in: path
+          description: User ID
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/user'
+  '/users/{userid}/books/':
+    get:
+      summary: return the list of books belonging to the user with matchin ID
+      operationId: getUserBooks
+      tags:
+        - users
+      parameters:
+        - name: userid
+          in: path
+          description: User ID
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/book'
+  '/users/{userid}/books/{bookid}':
+    get:
+      summary: return the selected book
+      operationId: getBook
+      tags:
+        - users
+      parameters:
+        - name: userid
+          in: path
+          description: User ID
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: bookid
+          in: path
+          description: Book ID
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/book'
+  '/books/{bookid}':
+    get:
+      summary: return the selected book
+      operationId: getBook
+      tags:
+        - books
+      parameters:
+        - name: bookid
+          in: path
+          description: Book ID
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/book'
+  '/books/{author}':
+    get:
+      summary: return a list of books by the author
+      operationId: getBookByAuthor
+      tags:
+        - books
+      parameters:
+        - name: author
+          in: path
+          description: Author Name
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/book'
+  '/books/{genre}':
+    get:
+      summary: return a list of books by the genre
+      operationId: getBookByGenre
+      tags:
+        - books
+      parameters:
+        - name: genre
+          in: path
+          description: Genre Search
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/book'
+  '/books/{publishedDate}':
+    get:
+      summary: return a list of books by published date
+      operationId: getBookByPublishDate
+      tags:
+        - books
+      parameters:
+        - name: publishedDate
+          in: path
+          description: published dates
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/book'
+  '/books/{bookid}/loaned/{userid}':
+    put:
+      summary: change loan status for book and update user
+      operationId: updateBookLoan
+      tags:
+        - books
+      parameters:
+        - name: bookid
+          in: path
+          description: Book ID
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: userid
+          in: path
+          description: User ID
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: success
+  '/books/{bookid}/returned/':
+    put:
+      summary: update the loan status and user
+      operationId: updateBook
+      tags:
+        - books
+      parameters:
+        - name: bookid
+          in: path
+          description: Book ID
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: success
+  '/books/{bookid}/note/':
+    post:
+      summary: add a note to the book
+      operationId: addNote
+      tags:
+        - books
+        - bookNotes
+      parameters:
+        - name: bookid
+          in: path
+          description: Book ID
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: success
+  '/books/{bookid}/note/{noteid}':
+    put:
+      summary: update the books notes
+      operationId: updateNote
+      tags:
+        - books
+        - bookNotes
+      parameters:
+        - name: bookid
+          in: path
+          description: Book ID
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: noteid
+          in: path
+          description: Note ID
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: success
+    delete:
+      summary: delete books note
+      operationId: deleteNote
+      tags:
+        - books
+        - bookNotes
+      parameters:
+        - name: bookid
+          in: path
+          description: Book ID
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: noteid
+          in: path
+          description: Note ID
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: success
+  /books/loaned/:
+    get:
+      summary: returns all loaned books
+      operationId: getLoans
+      tags:
+        - books
+      responses:
+        '200':
+          description: success
+  '/books/loaned/{userid}/':
+    get:
+      summary: returns all loaned books by user
+      operationId: getUserLoanedBooks
+      tags:
+        - books
+      parameters:
+        - name: userid
+          in: path
+          description: User ID
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: success
+  /books/search/:
+    get:
+      summary: search books by parameters
+      operationId: searchBooks
+      tags:
+        - books
+      responses:
+        '200':
+          description: success
